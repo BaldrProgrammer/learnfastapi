@@ -6,9 +6,10 @@ from app.students.schemas import SStudent
 
 router = APIRouter(prefix='/students', tags=['Работа со студентами'])
 
+
 @router.get('/', summary='получить всех студентов')
-async def get_students(request_body: RBStudent = Depends()) -> list[SStudent]:
-    return await StudentDAO.find_all(**request_body.to_dict())
+async def get_students() -> list[SStudent]:
+    return await StudentDAO.find_all()
 
 
 @router.get('/{id}', summary='получить одного студента по id')
@@ -20,10 +21,6 @@ async def get_student_by_id(student_id: int) -> SStudent | dict:
         return {'msg': 'Пользователя с таким id нет!'}
 
 
-@router.get('/by_filter', summary='получить одного студента по фильтрам')
-async def get_student_by_filter(request_body: RBStudent = Depends()) -> SStudent | dict:
-    student = await StudentDAO.find_one_or_none_by_filter(**request_body.to_dict())
-    if student:
-        return student
-    else:
-        return {'msg': 'Пользователя с таким id нет!'}
+@router.get('/filter_by', summary='получить всех студентов по фильтрам')
+async def get_students_by_filter(request_body: RBStudent = Depends()) -> list[SStudent]:
+    return await StudentDAO.find_all(True, **request_body.to_dict())
