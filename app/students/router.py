@@ -37,12 +37,12 @@ async def add_student(student_data: SStudentAdd) -> dict:
 
 
 @router.put('/update/', summary='изменить студента')
-async def update_student(student_id: int, new_values: SStudent) -> dict:
-    check = await StudentDAO.update_students(student_id, new_values.model_dump())
+async def update_student(student_id: int, new_values: dict) -> dict:
+    check = await StudentDAO.update_students(student_id, new_values)
     if check:
         return {'msg': 'Студент успешно изменен.', 'new_data': check}
     else:
-        return {'msg': 'Ошибка при изменении студента. приавет привет, я ек сказал '}
+        return {'msg': 'Ошибка при изменении студента.'}
 
 
 @router.delete('/delete/', summary='удалить студента')

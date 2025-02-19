@@ -1,6 +1,7 @@
 from sqlalchemy import update as sqlalchemy_update, delete as sqlalchemy_delete
 from sqlalchemy.future import select
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import selectinload
 from app.database import async_session_maker
 
 
@@ -58,9 +59,9 @@ class BaseDAO:
                 return result.rowcount
 
     @classmethod
-    async def find_all(cls, isfilters: bool = True, **filters):
+    async def find_all(cls, isfilters: bool = False, **filters):
         async with async_session_maker() as session:
-            query = select(cls.model)
+            query = select(cls.model).options(selectinload(cls.model.major))
             if isfilters:
                 query = query.filter_by(**filters)
             response = await session.execute(query)

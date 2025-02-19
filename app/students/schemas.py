@@ -2,6 +2,7 @@ from datetime import datetime, date
 from typing import Optional
 import re
 from pydantic import BaseModel, Field, EmailStr, field_validator, ConfigDict
+from app.students.models import Major
 
 
 class SStudent(BaseModel):
@@ -17,7 +18,6 @@ class SStudent(BaseModel):
     major_id: int = Field(..., ge=1, description="ID специальности студента")
     course: int = Field(..., ge=1, le=5, description="Курс должен быть в диапазоне от 1 до 5")
     special_notes: Optional[str] = Field(None, max_length=500, description="Дополнительные заметки, не более 500 символов")
-    major: Optional[str] = Field(..., description="Название факультета")
 
     @field_validator("phone_number")
     def validate_phone_number(cls, value):

@@ -1,10 +1,14 @@
-from sqlalchemy import insert, update, delete, event
+from sqlalchemy import update, delete, event
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import SQLAlchemyError
 from app.students.models import Student, Major
 from app.dao.base import BaseDAO
 from app.database import async_session_maker
+from app.students.schemas import SStudent
+
+
+import asyncio
 
 
 @event.listens_for(Student, 'after_insert')
@@ -61,6 +65,8 @@ class StudentDAO(BaseDAO):
     async def update_students(cls, student_id: int, values: dict):
         async with async_session_maker() as session:
             async with session.begin():
+                current_info = (await cls.find_all(True, id=student_id))[0].to_dict()
+                values = current_info | values
                 query = (
                     update(cls.model)
                     .filter_by(id=student_id)
