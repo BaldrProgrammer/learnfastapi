@@ -1,8 +1,9 @@
+from ipaddress import summarize_address_range
+
 from fastapi import APIRouter, Depends
 from app.students.dao import StudentDAO
 from app.students.rb import RBStudent
-from app.students.schemas import SStudent
-
+from app.students.schemas import SStudent, SStudentAdd
 
 router = APIRouter(prefix='/students', tags=['Работа со студентами'])
 
@@ -24,3 +25,30 @@ async def get_student_by_id(student_id: int) -> SStudent | dict:
 @router.get('/filter_by', summary='получить всех студентов по фильтрам')
 async def get_students_by_filter(request_body: RBStudent = Depends()) -> list[SStudent]:
     return await StudentDAO.find_all(True, **request_body.to_dict())
+
+
+@router.post('/add/', summary='добавить студента')
+async def add_student(student_data: SStudentAdd) -> dict:
+    check = await StudentDAO.add_students(student_data.model_dump())
+    if check:
+        return {'msg': 'Студент успешно добавлен.', 'student': check}
+    else:
+        return {'msg': 'Ошибка при добавлении студента.'}
+
+
+@router.put('/update/', summary='изменить студента')
+async def update_student(student_id: int, new_values: SStudent) -> dict:
+    check = await StudentDAO.update_students(student_id, new_values.model_dump())
+    if check:
+        return {'msg': 'Студент успешно изменен.', 'new_data': check}
+    else:
+        return {'msg': 'Ошибка при изменении студента. приавет привет, я ек сказал '}
+
+
+@router.delete('/delete/', summary='удалить студента')
+async def delete_student(student_id: int) -> dict:
+    check = await StudentDAO.del_students(student_id)
+    if check:
+        return {'msg': 'Студент успешно удален.', 'deleted_id': check}
+    else:
+        return {'msg': 'Ошибка при удалении студента.'}
