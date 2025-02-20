@@ -19,7 +19,7 @@ async def add_major(major: SMajorAdd) -> dict:
         return {'msg': 'Ошибка при добавлении факультета.'}
 
 
-@router.put('/update_description/', summary='Обновить факультет')
+@router.patch('/update_description/', summary='Обновить факультет')
 async def update_major(major: SMajorUpdDesc) -> dict:
     check = await MajorDAO.update(
         filter_by={'major_name': major.major_name},

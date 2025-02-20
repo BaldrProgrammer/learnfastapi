@@ -61,7 +61,7 @@ class BaseDAO:
     @classmethod
     async def find_all(cls, isfilters: bool = False, **filters):
         async with async_session_maker() as session:
-            query = select(cls.model).options(selectinload(cls.model.major))
+            query = select(cls.model)
             if isfilters:
                 query = query.filter_by(**filters)
             response = await session.execute(query)

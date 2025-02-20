@@ -1,52 +1,23 @@
 from sqlalchemy import update, delete, event
 from sqlalchemy.future import select
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.exc import SQLAlchemyError
-from app.students.models import Student, Major
+from app.students.models import Student
 from app.dao.base import BaseDAO
 from app.database import async_session_maker
-from app.students.schemas import SStudent
-
-
-import asyncio
-
-
-@event.listens_for(Student, 'after_insert')
-def receive_after_insert(mapper, connection, target):
-    major_id = target.major_id
-    connection.execute(
-        update(Major)
-        .where(Major.id == major_id)
-        .values(count_students=Major.count_students + 1)
-    )
-
-
-@event.listens_for(Student, 'after_delete')
-def receive_after_delete(mapper, connection, target):
-    major_id = target.major_id
-    connection.execute(
-        update(Major)
-        .where(Major.id == major_id)
-        .values(count_students=Major.count_students - 1)
-    )
 
 
 class StudentDAO(BaseDAO):
     model = Student
 
     @classmethod
-    async def find_full_data(cls, student_id: int):
+    async def find_all(cls, isfilters: bool = False, **filters):
         async with async_session_maker() as session:
-            query_student = select(cls.model).options(joinedload(cls.model.major)).filter_by(id=student_id)
-            result_student = (await session.execute(query_student)).scalar_one_or_none()
-
-            if not result_student:
-                return None
-
-            student_info = result_student.to_dict()
-            student_info['major_id'] = result_student.major.major_name
-
-            return student_info
+            query = select(cls.model)
+            if isfilters:
+                query = query.filter_by(**filters)
+            response = await session.execute(query)
+            return response.scalars().all()
 
     @classmethod
     async def add_students(cls, student_data: dict):

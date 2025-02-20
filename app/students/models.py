@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, text, Text
+from sqlalchemy import ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base, str_uniq, int_pk, str_null_true
 from datetime import date
@@ -6,6 +6,8 @@ from datetime import date
 
 # создаем модель таблицы студентов
 class Student(Base):
+    __tablename__ = 'students'
+
     id: Mapped[int_pk]
     phone_number: Mapped[str_uniq]
     first_name: Mapped[str]
@@ -14,12 +16,10 @@ class Student(Base):
     email: Mapped[str_uniq]
     address: Mapped[str] = mapped_column(Text, nullable=False)
     enrollment_year: Mapped[int]
-    course: Mapped[int]
     special_notes: Mapped[str_null_true]
-    major_id: Mapped[int] = mapped_column(ForeignKey("majors.id"), nullable=False)
+    course_id: Mapped[int] = mapped_column(ForeignKey('courses.id'), nullable=False)
 
-    # Определяем отношения: один студент имеет один факультет
-    major: Mapped["Major"] = relationship("Major", back_populates="students")
+    course: Mapped['Course'] = relationship('Course', back_populates='students')
 
     def __str__(self):
         return (f"{self.__class__.__name__}(id={self.id}, "
@@ -39,24 +39,6 @@ class Student(Base):
             "email": self.email,
             "address": self.address,
             "enrollment_year": self.enrollment_year,
-            "course": self.course,
             "special_notes": self.special_notes,
-            "major_id": self.major_id
+            "course_id": self.course_id
         }
-
-
-# создаем модель таблицы факультетов (majors)
-class Major(Base):
-    id: Mapped[int_pk]
-    major_name: Mapped[str_uniq]
-    major_description: Mapped[str_null_true]
-    count_students: Mapped[int] = mapped_column(server_default=text('0'))
-
-    # Определяем отношения: один факультет может иметь много студентов
-    students: Mapped[list["Student"]] = relationship("Student", back_populates="major")
-
-    def __str__(self):
-        return f"{self.__class__.__name__}(id={self.id}, major_name={self.major_name!r})"
-
-    def __repr__(self):
-        return str(self)

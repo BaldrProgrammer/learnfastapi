@@ -1,4 +1,6 @@
 from pydantic import Field, BaseModel, ConfigDict
+from typing import List
+from app.courses.schemas import SCourse
 
 
 class SMajor(BaseModel):
@@ -6,13 +8,13 @@ class SMajor(BaseModel):
     id: int
     major_name: str = Field(..., description='Название факультета')
     major_description: str = Field(..., description='Описание факультета')
-    count_students: int = Field(0, description='Количество студентов')
+
+    course: List[SCourse]
 
 
 class SMajorAdd(BaseModel):
     major_name: str = Field(..., description='Название факультета')
     major_description: str = Field(..., description='Описание факультета')
-    count_students: int = Field(0, description='Количество студентов')
 
 
 class SMajorUpdDesc(BaseModel):

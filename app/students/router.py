@@ -15,7 +15,7 @@ async def get_students() -> list[SStudent]:
 
 @router.get('/{id}', summary='получить одного студента по id')
 async def get_student_by_id(student_id: int) -> SStudent | dict:
-    student = await StudentDAO.find_full_data(student_id)
+    student = await StudentDAO.find_all(True, id=student_id)
     if student:
         return student
     else:
@@ -36,7 +36,7 @@ async def add_student(student_data: SStudentAdd) -> dict:
         return {'msg': 'Ошибка при добавлении студента.'}
 
 
-@router.put('/update/', summary='изменить студента')
+@router.patch('/update/', summary='изменить студента')
 async def update_student(student_id: int, new_values: dict) -> dict:
     check = await StudentDAO.update_students(student_id, new_values)
     if check:
