@@ -3,7 +3,6 @@ from typing import List
 from app.database import Base, str_uniq, int_pk, str_null_true
 
 
-# создаем модель таблицы факультетов (majors)
 class Major(Base):
     __tablename__ = 'majors'
 

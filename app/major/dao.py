@@ -1,8 +1,8 @@
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from app.dao.base import BaseDAO
-from app.major.models import Major
-from app.courses.models import Course
+from app.models import Major
+from app.models import Course
 from app.database import async_session_maker
 
 class MajorDAO(BaseDAO):

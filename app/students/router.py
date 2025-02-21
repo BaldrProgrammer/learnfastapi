@@ -1,5 +1,3 @@
-from ipaddress import summarize_address_range
-
 from fastapi import APIRouter, Depends
 from app.students.dao import StudentDAO
 from app.students.rb import RBStudent
@@ -45,7 +43,16 @@ async def update_student(student_id: int, new_values: dict) -> dict:
         return {'msg': 'Ошибка при изменении студента.'}
 
 
-@router.delete('/delete/', summary='удалить студента')
+@router.patch('/change_course/', summary='изменить курс студента')
+async def change_course(student_id: int, course_id: int) -> dict:
+    check = await StudentDAO.change_course(student_id, course_id)
+    if check:
+        return {'msg': 'Курс студента успешно изменен.', 'course_id': check}
+    else:
+        return {'msg': 'Ошибка при изменении курса студента.'}
+
+
+@router.delete('/delete/{student_id}', summary='удалить студента')
 async def delete_student(student_id: int) -> dict:
     check = await StudentDAO.del_students(student_id)
     if check:

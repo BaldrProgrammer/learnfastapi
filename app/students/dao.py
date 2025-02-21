@@ -1,8 +1,10 @@
-from sqlalchemy import update, delete, event
+import asyncio
+
+from sqlalchemy import update, delete
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.exc import SQLAlchemyError
-from app.students.models import Student
+from app.models import Student
 from app.dao.base import BaseDAO
 from app.database import async_session_maker
 
@@ -31,6 +33,22 @@ class StudentDAO(BaseDAO):
                     await session.rollback()
                     raise e
                 return new_student.to_dict()['id']
+
+    @classmethod
+    async def change_course(cls, student_id: int, course_id: int):
+        async with async_session_maker() as session:
+            query = (
+                update(cls.model)
+                .filter_by(id=student_id)
+                .values(course_id=course_id)
+            )
+            await session.execute(query)
+            try:
+                await session.commit()
+            except SQLAlchemyError as e:
+                await session.rollback()
+                raise e
+            return course_id
 
     @classmethod
     async def update_students(cls, student_id: int, values: dict):
@@ -64,3 +82,6 @@ class StudentDAO(BaseDAO):
                     await session.rollback()
                     raise e
                 return student_id
+
+
+# asyncio.run(StudentDAO.change_course(2, 1))
