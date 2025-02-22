@@ -76,7 +76,7 @@ class BaseDAO:
 
     @classmethod
     async def find_one_or_none_by_filter(cls, **filters):
-        async with async_session_maker as session:
+        async with async_session_maker() as session:
             query = select(cls.model).filter_by(**filters)
             response = await session.execute(query)
             return response.scalar_one_or_none()
