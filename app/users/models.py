@@ -1,4 +1,3 @@
-from sqlalchemy import text
 from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base, int_pk, str_uniq
 
